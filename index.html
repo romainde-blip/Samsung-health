@@ -151,6 +151,7 @@ main{padding-top:calc(var(--hdr) + var(--sat));padding-bottom:calc(var(--nav) + 
 .k-name{font-size:clamp(28px,8vw,36px);line-height:1.1}
 .k-meta{margin-top:14px;display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center}
 .k-date{margin-top:10px;font-size:12px;color:var(--tx2)}
+.k-tag{margin:18px auto 0;max-width:30ch;color:var(--tx2)}
 .tabs{position:sticky;top:calc(var(--hdr) + var(--sat));z-index:40;padding:10px var(--gr) 10px var(--gl);background:linear-gradient(var(--bg) 70%,rgba(1,2,5,0))}
 .tabs .pill{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;scroll-behavior:smooth}
 .tabs .pill::-webkit-scrollbar{display:none}
@@ -292,11 +293,11 @@ main{padding-top:calc(var(--hdr) + var(--sat));padding-bottom:calc(var(--nav) + 
 'use strict';
 /* =====================================================================
    RÉGLAGES
-   adminCode : code d'accès à l'espace pilotage (à changer avant diffusion).
+   adminCode : code d'accès à l'espace pilotage (ADMIN_PIN dans contenu.js).
    endpoint  : URL qui reçoit les événements (POST JSON). null = suivi local
                uniquement, sur l'appareil.
    ===================================================================== */
-const CONFIG = { adminCode: '2026', endpoint: null, version: 'Version 1.0 · contenus au 11/10/2026' };
+const CONFIG = { adminCode: ADMIN_PIN, endpoint: null, version: 'Contenus vérifiés au ' + CHECKED };
 
 /* =====================================================================
    CONTENU
@@ -306,59 +307,46 @@ const CONFIG = { adminCode: '2026', endpoint: null, version: 'Version 1.0 · con
    Format d'un kit (tous les champs sont facultatifs sauf id, name, univers) :
    {
      id, name, univers, family, type: 'phone'|'fold'|'tablet'|'laptop'|'watch'|'buds'|'service',
-     variant, img: 'visuels/visuel-01.webp', imgAr: .57,   // visuel officiel détouré et son ratio largeur/hauteur
-     status: 'verified'|'confirm'|'announced',
-     price: '1 999 €', priceStatus: 'confirm', priceNote: 'Relevé sur honor.com/fr le …', releaseFR: '…',
-     colors: '…', os: '…', footer: 'mentions légales de la fiche',
-     hook: '…',
-     figures: [{ value: 5000, unit: 'mAh', label: '…' }],       // 4
-     points: ['…'],                                              // 5
+     variant, img: 'visuels/….webp', imgAr: .5,   // visuel officiel détouré et son ratio largeur/hauteur
+     status: 'verified'|'confirm'|'announced', flag: true (kit phare de l'univers),
+     tagline, price, priceStatus, launch,          // launch : date de sortie et date du relevé de prix
+     hook, hookSub,
+     figures: [{ value: 6660, unit: 'mAh', label }],
+     points: [{ title, text }],
      alerts: ['…'],
-     modules: [{ id, title, screens: [{ title, text, tip }] }],
+     modules: [{ id, title, goal, time, screens: [{ kicker, title, text, tip }] }],
      demo: [{ title, accroche, preuve, benefice, action }],
-     pitch: { text: '…', keywords: ['…'] },
-     objections: [{ id, q, usage, preuve, montrer }],
-     quiz: [{ q, options: ['…'], answer: 0, explain: '…' }],
-     faq: [{ id, q, a, src }],
-     specs: [{ label, value, status, src }],
-     contradictions: [{ topic, a, b }],
-     sources: [{ label, url, note }],
-     videos: [{ id, title, channel, url }]   // liens YouTube externes, chaînes HONOR officielles
+     pitch: { text, keywords: ['…'] },
+     objections: [{ id, q, reponse, montrer }],
+     quiz: [{ q, options: ['…'], answer: 0, explain }],
+     faq: [{ id, q, a }],
+     specs: [{ group, rows: [{ label, value, status }] }],
+     contradictions: ['…'],
+     sources: [{ label, url }],
+     videos: [{ id, title, channel, url }]   // liens YouTube externes uniquement
    }
    ===================================================================== */
-const ENSEIGNES = ['Fnac','Darty','Boulanger','Orange','SFR','Bouygues Telecom','Free'];
 const ROLES = ['Promoteur','Chef de secteur','Formateur','Autre'];
 
-/* UNIVERS, KITS_RAW, GAMME et UNIVERS_ALERTS sont définis dans contenu.js */
-const SPEC_LABELS = {
-  phone:['Écran','Processeur','Photo','Batterie','Recharge','Protection IP','Poids et épaisseur','Système'],
-  fold:['Écran intérieur','Écran extérieur','Épaisseur pliée','Poids','Processeur','Photo','Batterie','Recharge','Protection IP','Système'],
-  tablet:['Écran','Processeur','Batterie','Stylet et clavier','Poids','Système'],
-  laptop:['Écran','Processeur','Mémoire et stockage','Autonomie','Poids','Système'],
-  watch:['Écran','Autonomie','Capteurs santé','Protection IP','Compatibilité'],
-  buds:['Réduction de bruit','Autonomie','Connexion','Protection IP','Compatibilité'],
-  service:['Compatibilité','Prérequis','Durée','Coût']
-};
-
+/* CHECKED, ADMIN_PIN, ENSEIGNES, UNIVERS, UNIVERS_ALERTS, KITS_RAW et GAMME sont définis dans contenu.js */
 function seq(n, f){ return Array.from({length:n}, (_, i) => f(i + 1)); }
 function buildKit(k){
   const id = k.id;
   const base = {
-    status:'confirm', price:null, priceStatus:'confirm', priceNote:null, releaseFR:null, hook:null, img:null, colors:null, os:null, footer:null,
-    partial: !(k.modules && k.demo && k.objections && k.faq),
+    status:'confirm', price:null, priceStatus:'confirm', launch:null, tagline:null, hook:null, hookSub:null, img:null,
     figures: seq(4, () => ({ value:null, unit:'', label:null })),
-    points: seq(5, () => null),
-    alerts: seq(2, () => null),
+    points: seq(5, () => ({ title:null, text:null })),
+    alerts: [],
     modules: seq(2, i => ({ id:`${id}-m${i}`, title:null, screens: seq(4, () => ({ title:null, text:null, tip:null })) })),
     demo: seq(4, () => ({ title:null, accroche:null, preuve:null, benefice:null, action:null })),
     pitch: { text:null, keywords:[] },
-    objections: seq(4, i => ({ id:`${id}-o${i}`, q:null, usage:null, preuve:null, montrer:null })),
+    objections: seq(4, i => ({ id:`${id}-o${i}`, q:null, reponse:null, montrer:null })),
     quiz: seq(3, () => ({ q:null, options:[null,null,null], answer:0, explain:null })),
-    faq: seq(4, i => ({ id:`${id}-f${i}`, q:null, a:null, src:null })),
-    specs: (SPEC_LABELS[k.type] || SPEC_LABELS.phone).map(l => ({ label:l, value:null, status:'confirm', src:null })),
-    contradictions: [{ topic:null, a:null, b:null }],
-    sources: [{ label:'honor.com/fr', url:'https://www.honor.com/fr/', note:'Page produit à reprendre' }],
-    videos: seq(2, i => ({ id:`${id}-v${i}`, title:null, channel:null, url:null }))
+    faq: seq(4, i => ({ id:`${id}-f${i}`, q:null, a:null })),
+    specs: [{ group:'Caractéristiques', rows:[{ label:'Données', value:null, status:'confirm' }] }],
+    contradictions: [],
+    sources: [{ label:'honor.com/fr', url:'https://www.honor.com/fr/' }],
+    videos: []
   };
   return Object.assign(base, k);
 }
@@ -385,10 +373,6 @@ const RM = window.matchMedia('(prefers-reduced-motion: reduce)');
 const reduced = () => RM.matches;
 const has = v => v !== null && v !== undefined && v !== '';
 function T(v, label){ return has(v) ? esc(v) : `<span class="ph">À reprendre · ${esc(label)}</span>`; }
-function srcLine(src){
-  if (!has(src)) return '';
-  return /^https?:/.test(src) ? `<a class="muted xs" href="${esc(src)}" target="_blank" rel="noopener">Source</a>` : `<span class="muted xs">Source : ${esc(src)}</span>`;
-}
 function stChip(s){ const d = STATUS[s] || STATUS.confirm; return `<span class="st ${d.cls}"><i></i>${d.label}</span>`; }
 
 function mkStore(area){
@@ -697,7 +681,7 @@ function renderHome(v){
     ${phares.map((k, i) => `<div class="slide${i === 0 ? ' on' : ''}" data-i="${i}" aria-hidden="${i !== 0}">
       <div class="eyebrow">${esc(UNI[k.univers].name)}</div>
       <h1 class="h-title">${k.name.split(' ').map((w, j) => `<span class="w" style="animation-delay:${.15 + j * .12}s">${esc(w)}</span>`).join(' ')}</h1>
-      <p class="h-hook">${T(k.hook, 'accroche')}</p>
+      <p class="h-hook">${T(k.tagline || k.hook, 'accroche')}</p>
       <a class="btn" href="#/k/${k.id}">Ouvrir le kit</a>
       <div class="stage">${visual(k, wide(k) ? 220 : 300, { plx:true, mw:'92%' })}</div>
     </div>`).join('')}
@@ -795,6 +779,7 @@ function renderUnivers(v, id){
       <div class="eyebrow">Univers</div>
       <h1 style="font-size:34px;line-height:1.1;margin-top:8px">${esc(u.name)}</h1>
       <p class="muted small" style="margin-top:10px">${esc(u.families)}</p>
+      ${u.intro ? `<p style="margin:16px auto 0;max-width:34ch">${esc(u.intro)}</p>` : ''}
     </div>
     ${alert ? `<div class="gut" style="margin-top:20px"><div class="card alert">${I.alert}<div>${esc(alert)}</div></div></div>` : ''}
     <div class="gut" style="margin-top:24px">
@@ -804,7 +789,7 @@ function renderUnivers(v, id){
         <div style="font-size:24px;line-height:1.15">${esc(phare.name)}</div>
         <div class="k-meta">${stChip(phare.status)}</div>
         <div class="k-meta"><span class="muted small">${has(phare.price) ? esc(phare.price) : 'Prix à reprendre'}</span>${has(phare.price) ? stChip(phare.priceStatus) : ''}</div>
-        <p class="muted small" style="margin-top:10px">${T(phare.hook, 'accroche')}</p>
+        <p class="muted small" style="margin-top:10px">${T(phare.tagline || phare.hook, 'accroche')}</p>
         <span class="btn" style="margin-top:18px">Ouvrir le kit</span>
       </a>
     </div>
@@ -843,9 +828,9 @@ function renderKit(v, id, tab){
       <h1 class="k-name">${esc(k.name)}</h1>
       <div class="k-meta">${stChip(k.status)}</div>
       <div class="k-meta"><span>${has(k.price) ? esc(k.price) : '<span class="ph">Prix à reprendre</span>'}</span>${has(k.price) ? stChip(k.priceStatus) : ''}</div>
-      <div class="k-date">${has(k.priceNote) ? esc(k.priceNote) : 'Relevé sur honor.com/fr le : à reprendre'}<br>${has(k.releaseFR) ? `Sortie France : ${esc(k.releaseFR)}` : 'Sortie France : à reprendre'}</div>
+      <div class="k-date">${has(k.launch) ? esc(k.launch) : 'Date de sortie et relevé du prix : à reprendre'}</div>
+      ${has(k.tagline) ? `<p class="k-tag">${esc(k.tagline)}</p>` : ''}
     </div>
-    ${k.partial ? `<div class="ph-band">${I.info}<span>Kit partiel : les contenus marqués « À reprendre » n’existent pas encore dans les fiches vérifiées.</span></div>` : ''}
     <div class="tabs"><div class="pill" id="tabs" role="tablist">${TABS.map(t => `<button class="pill-i${t[0] === tab ? ' on' : ''}" role="tab" data-tab="${t[0]}" aria-selected="${t[0] === tab}">${t[1]}</button>`).join('')}</div></div>
     <div class="panel" id="panel"></div>
   </div>`;
@@ -875,18 +860,20 @@ function setTab(tab, initial){
 const TABRENDER = {
   essentiel(k){
     return `<p class="hook">${T(k.hook, 'accroche')}</p>
+    ${has(k.hookSub) ? `<p class="muted" style="margin-top:10px">${esc(k.hookSub)}</p>` : ''}
     <div class="figs">${k.figures.map((f, i) => `<div class="card fig">
       <div class="n">${typeof f.value === 'number' ? `<span class="count" data-to="${f.value}">0</span>${f.unit ? `<small>${esc(f.unit)}</small>` : ''}` : (has(f.value) ? esc(f.value) : '<span class="muted">··</span>')}</div>
       <div class="muted small">${T(f.label, 'chiffre clé ' + (i + 1))}</div></div>`).join('')}</div>
     <section class="sec"><div class="sec-h"><h2>Points clés</h2></div>
-      <ol class="pts">${k.points.map((p, i) => `<li><span class="num">${String(i + 1).padStart(2, '0')}</span><span>${T(p, 'point clé ' + (i + 1))}</span></li>`).join('')}</ol></section>
-    <section class="sec"><div class="sec-h"><h2>Alertes vendeur</h2></div>
-      <div class="list">${k.alerts.map((a, i) => `<div class="card alert">${I.alert}<div>${T(a, 'alerte ' + (i + 1))}</div></div>`).join('')}</div></section>`;
+      <ol class="pts">${k.points.map((p, i) => `<li><span class="num">${String(i + 1).padStart(2, '0')}</span><span><span style="display:block">${T(p.title, 'point clé ' + (i + 1))}</span>${has(p.text) ? `<span class="muted small" style="display:block;margin-top:4px">${esc(p.text)}</span>` : ''}</span></li>`).join('')}</ol></section>
+    ${k.alerts.length ? `<section class="sec"><div class="sec-h"><h2>Alertes vendeur</h2></div>
+      <div class="list">${k.alerts.map(a => `<div class="card alert">${I.alert}<div>${esc(a)}</div></div>`).join('')}</div></section>` : ''}
+    ${has(k.note) ? `<p class="muted xs" style="margin-top:22px">${esc(k.note)}</p>` : ''}`;
   },
   modules(k){
     return `<p class="muted">Des decks courts, à lire en plein écran avant ou pendant la vente.</p>
     <div class="list" style="margin-top:18px">${k.modules.map((m, i) => `<button class="card tap pad row" data-act="module" data-i="${i}" style="text-align:left;width:100%">
-      <div class="grow"><div class="lbl">Module ${i + 1} · ${m.screens.length} écrans</div><div>${T(m.title, 'titre du module')}</div></div>
+      <div class="grow"><div class="lbl">Module ${i + 1} · ${m.screens.length} écrans${m.time ? ' · ' + esc(m.time) : ''}</div><div>${T(m.title, 'titre du module')}</div>${has(m.goal) ? `<div class="muted small" style="margin-top:4px">${esc(m.goal)}</div>` : ''}</div>
       <span class="round sm">${I.right}</span></button>`).join('')}</div>`;
   },
   demo(k){
@@ -911,9 +898,8 @@ const TABRENDER = {
     <div style="margin-top:18px">${k.objections.map((o, i) => `<div class="acc" data-obj="${o.id}">
       <button class="acc-h" data-act="acc"><span class="q">${T(o.q, 'objection ' + (i + 1))}</span>${I.plus}</button>
       <div class="acc-b step3">
-        <div class="card"><div class="lbl">L’usage</div>${T(o.usage, 'réponse par l’usage')}</div>
-        <div class="card"><div class="lbl">La preuve</div>${T(o.preuve, 'preuve')}</div>
-        <div class="card"><div class="lbl">À montrer</div>${T(o.montrer, 'geste ou écran à montrer')}</div>
+        <div class="card"><div class="lbl">Réponse : l’usage, puis la preuve</div>${T(o.reponse, 'réponse')}</div>
+        ${has(o.montrer) ? `<div class="card"><div class="lbl">À montrer</div>${esc(o.montrer)}</div>` : ''}
       </div></div>`).join('')}</div>`;
   },
   quiz(){ return `<div id="quiz"></div>`; },
@@ -921,20 +907,19 @@ const TABRENDER = {
     return `<p class="muted">Questions reformulées à partir des sources officielles.</p>
     <div style="margin-top:18px">${k.faq.map((f, i) => `<div class="acc" data-faq="${f.id}">
       <button class="acc-h" data-act="acc"><span class="q">${T(f.q, 'question ' + (i + 1))}</span>${I.plus}</button>
-      <div class="acc-b"><p>${T(f.a, 'réponse reformulée')}</p><div style="margin-top:10px">${srcLine(f.src)}</div></div></div>`).join('')}</div>`;
+      <div class="acc-b"><p>${T(f.a, 'réponse reformulée')}</p></div></div>`).join('')}</div>`;
   },
   fiche(k){
-    return `<div>${k.specs.map(s => `<div class="spec"><div class="muted small">${esc(s.label)}</div><div class="v"><span>${T(s.value, 'valeur')}</span>${stChip(s.status)}${s.label === 'Protection IP' ? '<span class="muted xs">Indiquer la certification IP. Cette protection n’est pas permanente.</span>' : ''}${srcLine(s.src)}</div></div>`).join('')}
-      ${has(k.colors) ? `<div class="spec"><div class="muted small">Coloris</div><div class="v"><span>${esc(k.colors)}</span>${stChip(k.status === 'verified' ? 'verified' : 'confirm')}</div></div>` : ''}</div>
-    ${has(k.footer) ? `<p class="muted xs" style="margin-top:14px">${esc(k.footer)}</p>` : ''}
-    <section class="sec"><div class="sec-h"><h2>Contradictions relevées</h2></div>
-      <div class="list">${k.contradictions.map(c => `<div class="card pad"><div>${T(c.topic, 'sujet')}</div>
-        <div class="step3" style="margin-top:10px"><div class="muted small">Source A : ${T(c.a, 'valeur annoncée')}</div><div class="muted small">Source B : ${T(c.b, 'valeur annoncée')}</div></div></div>`).join('')}</div></section>
+    return `${k.specs.map(g => `<section style="margin-bottom:26px"><div class="lbl" style="margin-bottom:4px">${esc(g.group)}</div>
+      ${g.rows.map(r => `<div class="spec"><div class="muted small">${esc(r.label)}</div><div class="v"><span>${T(r.value, 'valeur')}</span>${stChip(r.status)}${/eau et poussi|protection ip/i.test(r.label) ? '<span class="muted xs">Certification en conditions de test. La protection n’est pas permanente.</span>' : ''}</div></div>`).join('')}</section>`).join('')}
+    <section class="sec"><div class="sec-h"><h2>Contradictions relevées</h2><span class="muted small">${k.contradictions.length}</span></div>
+      ${k.contradictions.length ? `<div class="list">${k.contradictions.map(c => `<div class="card alert">${I.alert}<div class="small">${esc(c)}</div></div>`).join('')}</div>` : '<p class="muted small">Aucune contradiction relevée entre les sources.</p>'}</section>
     <section class="sec"><div class="sec-h"><h2>Sources</h2></div>
-      <div class="list">${k.sources.map(s => s.url ? `<a class="card src tap" href="${esc(s.url)}" target="_blank" rel="noopener"><div class="grow"><div>${esc(s.label)}</div>${s.note ? `<div class="muted xs">${esc(s.note)}</div>` : ''}</div>${I.ext}</a>` : `<div class="card src"><div class="grow"><div>${esc(s.label)}</div>${s.note ? `<div class="muted xs">${esc(s.note)}</div>` : ''}</div></div>`).join('')}</div></section>`;
+      <div class="list">${k.sources.map(s => s.url ? `<a class="card src tap" href="${esc(s.url)}" target="_blank" rel="noopener"><div class="grow"><div>${esc(s.label)}</div><div class="muted xs ell">${esc(s.url.replace(/^https?:\/\/(www\.)?/, ''))}</div></div>${I.ext}</a>` : `<div class="card src"><div class="grow">${esc(s.label)}</div></div>`).join('')}</div></section>`;
   },
   videos(k){
     return `<p class="muted">Liens vers les chaînes YouTube officielles HONOR. Les vidéos s’ouvrent dans YouTube.</p>
+    ${k.videos.length ? '' : '<p class="muted small" style="margin-top:18px">Aucune vidéo officielle repérée pour ce kit.</p>'}
     <div class="list" style="margin-top:18px">${k.videos.map((vd, i) => has(vd.url)
       ? `<a class="card src tap" href="${esc(vd.url)}" target="_blank" rel="noopener" data-video="${vd.id}"><span class="round sm">${I.play}</span><div class="grow"><div>${esc(vd.title || 'Vidéo')}</div><div class="muted xs">${esc(vd.channel || 'YouTube')}</div></div>${I.ext}</a>`
       : `<div class="card src" aria-disabled="true"><span class="round sm" style="opacity:.4">${I.play}</span><div class="grow"><div>${T(null, 'vidéo ' + (i + 1))}</div><div class="muted xs">Lien YouTube officiel à reprendre</div></div></div>`).join('')}</div>`;
@@ -1040,9 +1025,10 @@ function openModule(k, mi){
     fs.innerHTML = `<div class="fs-top"><button class="round" data-act="close" aria-label="Fermer">${I.close}</button><div class="grow ell small">${has(m.title) ? esc(m.title) : 'Module ' + (mi + 1)}</div><span class="muted small">${i + 1} / ${m.screens.length}</span></div>
       <div class="fs-prog">${m.screens.map((_, j) => `<span class="${j <= i ? 'on' : ''}"></span>`).join('')}</div>
       <div class="fs-body"><div class="fade">
+        ${has(s.kicker) ? `<div class="lbl">${esc(s.kicker)}</div>` : ''}
         <h2>${T(s.title, 'titre de l’écran')}</h2>
         <p style="margin-top:16px;font-size:17px;line-height:1.55">${T(s.text, 'texte de l’écran')}</p>
-        <div class="tip"><div class="lbl">${I.store}En magasin</div>${T(s.tip, 'conseil en magasin')}</div>
+        ${has(s.tip) ? `<div class="tip"><div class="lbl">${I.store}En magasin</div>${esc(s.tip)}</div>` : ''}
       </div></div>
       <div class="fs-bot"><button class="round" data-act="fsPrev" aria-label="Écran précédent" ${i === 0 ? 'style="opacity:.35"' : ''}>${I.left}</button><button class="btn" data-act="fsNext">${i + 1 < m.screens.length ? 'Écran suivant' : 'Terminer le module'}</button></div>`;
   };
@@ -1101,11 +1087,11 @@ function buildIndex(){
   const add = (type, title, text, href, extra) => idx.push(Object.assign({ type, title, text: text || '', href, n: norm(title + ' ' + (text || '')) }, extra || {}));
   KITS.forEach(k => {
     const u = UNI[k.univers].name;
-    add('Kits', k.name, [u, k.family, k.hook].filter(has).join(' · '), `#/k/${k.id}`);
+    add('Kits', k.name, [u, k.family, k.tagline].filter(has).join(' · '), `#/k/${k.id}`);
     add('Démos', `Démo guidée · ${k.name}`, k.demo.map(s => s.title).filter(has).join(' · '), `#/k/${k.id}/demo`);
     k.faq.forEach((f, i) => add('FAQ', has(f.q) ? f.q : `Question ${i + 1} (à reprendre)`, `${k.name}${has(f.a) ? ' · ' + f.a : ''}`, `#/k/${k.id}/faq`));
-    k.objections.forEach((o, i) => add('Objections', has(o.q) ? o.q : `Objection ${i + 1} (à reprendre)`, `${k.name}${has(o.usage) ? ' · ' + o.usage : ''}`, `#/k/${k.id}/objections`));
-    k.specs.forEach(s => add('Fiches', `${s.label} · ${k.name}`, has(s.value) ? s.value : 'Valeur à reprendre', `#/k/${k.id}/fiche`));
+    k.objections.forEach((o, i) => add('Objections', has(o.q) ? o.q : `Objection ${i + 1} (à reprendre)`, `${k.name}${has(o.reponse) ? ' · ' + o.reponse : ''}`, `#/k/${k.id}/objections`));
+    k.specs.forEach(g => g.rows.forEach(r => add('Fiches', `${r.label} · ${k.name}`, has(r.value) ? r.value : 'Valeur à reprendre', `#/k/${k.id}/fiche`)));
   });
   GAMME.forEach(g => add('Gamme', g.name, `${UNI[g.univers].name} · ${g.note || 'Kit à construire'}`, `#/u/${g.univers}`));
   UNIVERS.forEach(u => add('Univers', u.name, u.families, `#/u/${u.id}`));
@@ -1243,7 +1229,7 @@ function sampleEvents(){
       else if (x < .55){ const s = Math.floor(r() * 4); ev.push(Object.assign({ type:'quiz', score:s, total:3, pct:Math.round(Math.min(s, 3) / 3 * 100) }, base)); }
       else if (x < .7) ev.push(Object.assign({ type:'faq_read', faq:k.faq[Math.floor(r() * 2)].id }, base));
       else if (x < .8) ev.push(Object.assign({ type:'module_open', module:k.modules[0].id }, base));
-      else if (x < .86) ev.push(Object.assign({ type:'video_open', video:k.videos[0].id }, base));
+      else if (x < .86 && k.videos.length) ev.push(Object.assign({ type:'video_open', video:k.videos[0].id }, base));
       else { const q = qs[Math.floor(r() * qs.length)]; ev.push(Object.assign({ type:'search', q:q[0], n:q[1] }, base)); }
     }
   });
