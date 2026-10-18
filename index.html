@@ -307,7 +307,7 @@ const CONFIG = { adminCode: '2026', endpoint: null, version: 'Coquille 0.1' };
    Format d'un kit (tous les champs sont facultatifs sauf id, name, univers) :
    {
      id, name, univers, family, type: 'phone'|'fold'|'tablet'|'laptop'|'watch'|'buds'|'service',
-     variant, img: 'visuel-detoure.png',
+     variant, img: 'visuels/visuel-01.webp', imgAr: .57,   // visuel officiel détouré et son ratio largeur/hauteur
      status: 'verified'|'confirm'|'announced',
      price: '1 999 €', priceDate: '12/10/2026', releaseFR: '…',
      hook: '…',
@@ -339,16 +339,16 @@ const UNIVERS = [
 ];
 
 const KITS_RAW = [
-  { id:'magic-v6', name:'HONOR Magic V6', univers:'smartphones', family:'Magic V · pliable', type:'fold' },
+  { id:'magic-v6', name:'HONOR Magic V6', univers:'smartphones', family:'Magic V · pliable', type:'fold', img:'visuels/visuel-14.webp', imgAr:.773 },
   { id:'magic8-pro', name:'HONOR Magic8 Pro', univers:'smartphones', family:'Magic', type:'phone', variant:'pro' },
   { id:'magic8-lite', name:'HONOR Magic8 Lite', univers:'smartphones', family:'Magic', type:'phone', variant:'lite' },
   { id:'600-pro', name:'HONOR 600 Pro', univers:'smartphones', family:'Série N · 600', type:'phone', variant:'n' },
   { id:'600', name:'HONOR 600', univers:'smartphones', family:'Série N · 600', type:'phone', variant:'n' },
   { id:'600-lite', name:'HONOR 600 Lite', univers:'smartphones', family:'Série N · 600', type:'phone', variant:'lite' },
-  { id:'magicpad4', name:'HONOR MagicPad4', univers:'tablettes', family:'MagicPad', type:'tablet' },
-  { id:'magicbook-16-2026', name:'HONOR MagicBook 16 2026', univers:'ordinateurs', family:'MagicBook', type:'laptop' },
-  { id:'watch-6', name:'HONOR Watch 6', univers:'montres', family:'Montres', type:'watch' },
-  { id:'earbuds-4', name:'HONOR Earbuds 4', univers:'audio', family:'Earbuds', type:'buds' },
+  { id:'magicpad4', name:'HONOR MagicPad4', univers:'tablettes', family:'MagicPad', type:'tablet', img:'visuels/visuel-10.webp', imgAr:1.37 },
+  { id:'magicbook-16-2026', name:'HONOR MagicBook 16 2026', univers:'ordinateurs', family:'MagicBook', type:'laptop', img:'visuels/visuel-08.webp', imgAr:1.443 },
+  { id:'watch-6', name:'HONOR Watch 6', univers:'montres', family:'Montres', type:'watch', img:'visuels/visuel-09.webp', imgAr:.947 },
+  { id:'earbuds-4', name:'HONOR Earbuds 4', univers:'audio', family:'Earbuds', type:'buds', img:'visuels/visuel-11.webp', imgAr:.984 },
   { id:'passer-chez-honor', name:'Passer chez HONOR', univers:'services', family:'Services', type:'service' }
 ];
 
@@ -569,11 +569,12 @@ function drawSVG(type, variant){
   }
   return `<svg viewBox="${vb}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${defs(u)}${g}</svg>`;
 }
+const wide = it => (it.img && it.imgAr ? it.imgAr : AR[it.type || 'phone']) > 1.1;
 function visual(item, h, opts = {}){
   const type = item.type || 'phone';
-  const art = item.img ? `<img src="${esc(item.img)}" alt="">` : drawSVG(type, item.variant);
-  const refl = item.img ? `<img src="${esc(item.img)}" alt="">` : drawSVG(type, item.variant);
-  return `<div class="prod${opts.spin === false ? '' : ' spin'}${opts.plx ? ' plx' : ''}" style="--h:${h}px;--ar:${AR[type]};${opts.mw ? `--mw:${opts.mw};` : ''}" role="img" aria-label="${esc(item.name || '')}">
+  const art = item.img ? `<img src="${esc(item.img)}" alt="" decoding="async" draggable="false">` : drawSVG(type, item.variant);
+  const refl = item.img ? `<img src="${esc(item.img)}" alt="" decoding="async" draggable="false">` : drawSVG(type, item.variant);
+  return `<div class="prod${opts.spin === false ? '' : ' spin'}${opts.plx ? ' plx' : ''}" style="--h:${h}px;--ar:${item.img && item.imgAr ? item.imgAr : AR[type]};${opts.mw ? `--mw:${opts.mw};` : ''}" role="img" aria-label="${esc(item.name || '')}">
     <div class="rot">${art}<div class="refl">${refl}</div></div><div class="halo"></div></div>`;
 }
 
@@ -731,7 +732,7 @@ function renderHome(v){
       <h1 class="h-title">${k.name.split(' ').map((w, j) => `<span class="w" style="animation-delay:${.15 + j * .12}s">${esc(w)}</span>`).join(' ')}</h1>
       <p class="h-hook">${T(k.hook, 'accroche')}</p>
       <a class="btn" href="#/k/${k.id}">Ouvrir le kit</a>
-      <div class="stage">${visual(k, k.type === 'laptop' || k.type === 'buds' ? 200 : 300, { plx:true, mw:'92%' })}</div>
+      <div class="stage">${visual(k, wide(k) ? 220 : 300, { plx:true, mw:'92%' })}</div>
     </div>`).join('')}
     <div class="h-ctrl">
       <button class="round" data-act="heroPrev" aria-label="Précédent">${I.left}</button>
@@ -866,7 +867,7 @@ function renderKit(v, id, tab){
   const k = KIT[id];
   track('kit_open', { kit:id });
   rememberKit(id, tab);
-  const h = k.type === 'laptop' || k.type === 'buds' ? 210 : 300;
+  const h = wide(k) ? 230 : 300;
   v.innerHTML = `<div class="fade">
     <div class="k-hero">
       <div class="eyebrow">${esc(UNI[k.univers].name)} · ${esc(k.family || '')}</div>
