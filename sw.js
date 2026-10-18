@@ -1,5 +1,5 @@
 // Cache de la coquille pour un usage en magasin avec un réseau faible.
-const CACHE = 'trousse-honor-v4';
+const CACHE = 'trousse-honor-v5';
 const SHELL = ['./', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'icon-180.png', 'contenu.js'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting())); });
 self.addEventListener('activate', e => {

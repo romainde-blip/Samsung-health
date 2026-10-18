@@ -4,6 +4,8 @@
    Repris de Trousse-HONOR.html (contenus vérifiés au 16 octobre 2026).
    Les fiches vendeur HONOR (one-pagers, revérifiées le 08/10/2026) priment
    en cas de doute : les écarts sont listés dans « contradictions ».
+   Les conseils « En magasin » absents de la trousse ont été ajoutés : gestes
+   et questions uniquement, sans donnée produit nouvelle.
    Statuts : 'verified' = Vérifié, 'confirm' = À confirmer, 'announced' = Annoncé.
    Un champ absent ou à null s'affiche « À reprendre ».
    ===================================================================== */
@@ -189,7 +191,7 @@ const KITS_RAW = [
       "kicker": "Ouvrir",
       "title": "Commencez fermé",
       "text": "Le premier effet, c'est la finesse. Le client le prend en main plié et cherche où est le pliable.",
-      "tip": null
+      "tip": "Tendez-le plié, écran extérieur allumé, et laissez le client chercher la charnière avant de dire un mot."
      },
      {
       "kicker": "Montrer",
@@ -201,13 +203,13 @@ const KITS_RAW = [
       "kicker": "Rassurer",
       "title": "La question de la solidité arrive toujours",
       "text": "Répondez par les preuves : 500 000 pliages testés par SGS, IP68 et IP69, écran prévu pour un usage sans film.",
-      "tip": null
+      "tip": "Laissez le client poser la question lui-même, puis répondez en dépliant et repliant devant lui."
      },
      {
       "kicker": "Accompagner",
       "title": "Changer de téléphone est simple",
       "text": "Device Clone transfère les données d'un iPhone ou d'un Android en scannant un QR code, sans câble.",
-      "tip": null
+      "tip": "Proposez de lancer le transfert ensemble en magasin : le client part avec un téléphone prêt."
      },
      {
       "kicker": "Conclure",
@@ -717,7 +719,7 @@ const KITS_RAW = [
       "kicker": "L'endurance",
       "title": "6 270 mAh, 100 W et 80 W sans fil",
       "text": "La batterie suit une journée de photos, et se recharge vite avec le chargeur HONOR vendu à part.",
-      "tip": null
+      "tip": "Demandez à quelle heure son téléphone actuel est à plat. Rappelez que le chargeur se vend à part."
      }
     ]
    },
@@ -731,19 +733,19 @@ const KITS_RAW = [
       "kicker": "Retouche",
       "title": "Assistant photo IA",
       "text": "Gommer un passant, agrandir un cadrage, détourer un sujet, d'un geste ou à la voix.",
-      "tip": null
+      "tip": "Photographiez le client devant le rayon, puis gommez un élément derrière lui sous ses yeux."
      },
      {
       "kicker": "Couleurs",
       "title": "Magic Color",
       "text": "L'IA applique à vos photos la palette d'une image de référence que vous aimez.",
-      "tip": null
+      "tip": "Demandez au client de choisir une photo qu’il aime dans sa galerie et appliquez sa palette."
      },
      {
       "kicker": "Lecture d'écran",
       "title": "Suggestions intelligentes",
       "text": "Résumé d'un texte ou floutage des données sensibles, proposés au bon moment.",
-      "tip": null
+      "tip": "Ouvrez un long texte sur le téléphone de démo et lancez le résumé devant le client."
      },
      {
       "kicker": "Sécurité",
@@ -1158,25 +1160,25 @@ const KITS_RAW = [
       "kicker": "La batterie",
       "title": "7 500 mAh, jusqu'à 3 jours selon HONOR",
       "text": "Un week-end sans chargeur. Recharge 66 W avec le chargeur HONOR.",
-      "tip": null
+      "tip": "Posez la question : « Vous partez souvent un week-end sans chargeur ? »"
      },
      {
       "kicker": "La solidité",
       "title": "2,5 m de chute testée",
       "text": "Sur granit lisse, en laboratoire HONOR. Certification SGS 5 étoiles fiabilité complète.",
-      "tip": null
+      "tip": "Demandez au client s’il a déjà cassé un écran. Sa réponse vous donne l’argument."
      },
      {
       "kicker": "L'eau",
       "title": "IP66, IP68, IP69, IP69K",
       "text": "Pluie, immersion, jets haute pression. Ne dites jamais « étanche ».",
-      "tip": null
+      "tip": "Dites « certifié IP68, IP69 et IP69K », puis précisez que la protection n’est pas permanente."
      },
      {
       "kicker": "L'écran",
       "title": "6,79 pouces AMOLED 120 Hz",
       "text": "Jusqu'à 6 000 nits en pic HDR en vidéo plein écran, gradation PWM 3 840 Hz.",
-      "tip": null
+      "tip": "Lancez une vidéo en plein écran et montrez-la sous l’éclairage le plus fort du magasin."
      }
     ]
    }
@@ -1569,7 +1571,7 @@ const KITS_RAW = [
       "kicker": "Pour qui",
       "title": "Le client qui zoome et qui veut de la puissance",
       "text": "Photos de voyage, concerts, jeux : il veut un téléphone complet sans payer un très haut de gamme.",
-      "tip": null
+      "tip": "Demandez : « Vous prenez souvent des photos de loin, en voyage ou en concert ? »"
      },
      {
       "kicker": "Le zoom",
@@ -1581,19 +1583,19 @@ const KITS_RAW = [
       "kicker": "L'écran",
       "title": "8 000 nits en pic HDR",
       "text": "Lisible en plein soleil, et doux pour les yeux le soir avec une gradation PWM 3 840 Hz.",
-      "tip": null
+      "tip": "Montrez l’écran sous le spot le plus fort du rayon, à côté du téléphone du client."
      },
      {
       "kicker": "La puce",
       "title": "Snapdragon 8 Elite",
       "text": "Une puce haut de gamme : c'est l'autre écart avec le 600, équipé d'un Snapdragon 7 Gen 4.",
-      "tip": null
+      "tip": "Si le client hésite avec le 600, posez les deux côte à côte et lancez la même appli."
      },
      {
       "kicker": "La charge",
       "title": "80 W et 50 W sans fil",
       "text": "Le 600 Pro se recharge aussi sans fil, contrairement au 600.",
-      "tip": null
+      "tip": "Si votre rayon a un chargeur sans fil, posez-le dessus. Sinon, montrez la mention sur la fiche."
      }
     ]
    }
@@ -1963,31 +1965,31 @@ const KITS_RAW = [
       "kicker": "Pour qui",
       "title": "Le client qui photographie tout, tout le temps",
       "text": "Famille, repas, sorties : il veut de belles photos et une batterie qui suit.",
-      "tip": null
+      "tip": "Demandez au client de montrer les dernières photos de sa galerie : vous saurez ce qu’il photographie."
      },
      {
       "kicker": "La photo",
       "title": "200 Mpx Ultra Night",
       "text": "Grand capteur stabilisé, même de nuit. Macro avec l'ultra grand-angle 12 Mpx.",
-      "tip": null
+      "tip": "Prenez une photo en macro d’un objet du rayon et faites zoomer le client dedans."
      },
      {
       "kicker": "Le format",
       "title": "7,8 mm et 185 g",
       "text": "Cadre en métal mat, bordures de 0,98 mm : un écran bord à bord.",
-      "tip": null
+      "tip": "Faites-le tenir de profil par le client, puis faites toucher le cadre."
      },
      {
       "kicker": "L'IA",
       "title": "Bouton IA et Image to Video 2.0",
       "text": "Une photo s'anime en un geste, depuis le bouton dédié.",
-      "tip": null
+      "tip": "Animez une photo que vous venez de prendre du client : c’est l’effet le plus parlant."
      },
      {
       "kicker": "Bien orienter",
       "title": "600 ou 600 Pro ?",
       "text": "Le 600 Pro ajoute un téléobjectif 3,5x, le Snapdragon 8 Elite et la charge sans fil.",
-      "tip": null
+      "tip": "Posez une seule question : « Vous zoomez souvent ? » Si oui, 600 Pro. Sinon, 600."
      }
     ]
    }
@@ -2357,7 +2359,7 @@ const KITS_RAW = [
       "kicker": "Pour qui",
       "title": "Le client qui a un budget serré mais des exigences",
       "text": "Il veut un téléphone qui dure deux jours et qui ne fait pas « bas de gamme » en main.",
-      "tip": null
+      "tip": "Mettez-le dans la main du client avant de parler du prix."
      },
      {
       "kicker": "La matière",
@@ -2369,19 +2371,19 @@ const KITS_RAW = [
       "kicker": "L'autonomie",
       "title": "48 h certifiées TÜV Rheinland",
       "text": "6 520 mAh, charge 45 W avec le chargeur HONOR.",
-      "tip": null
+      "tip": "Dites « certifié 48 heures par TÜV Rheinland », pas « la batterie tient deux jours »."
      },
      {
       "kicker": "La photo",
       "title": "108 Mpx et bouton AI Camera",
       "text": "Une pression et l'appareil photo est prêt.",
-      "tip": null
+      "tip": "Verrouillez le téléphone, tendez-le au client et laissez-le appuyer sur le bouton."
      },
      {
       "kicker": "L'IA",
       "title": "Gomme, sous-titres, synthèse",
       "text": "Effacer un passant, sous-titrer une vidéo sans le son, résumer un long texte.",
-      "tip": null
+      "tip": "Choisissez une seule fonction selon le client : la gomme pour un parent, la synthèse pour un étudiant."
      }
     ]
    }
@@ -2796,7 +2798,7 @@ const KITS_RAW = [
       "kicker": "Repérer",
       "title": "Le client parle de cours, de notes ou de documents",
       "text": "C'est le moment de parler du clavier et du stylet.",
-      "tip": null
+      "tip": "Laissez parler le client : dès qu’il dit « cours », « notes » ou « documents », passez à l’écran suivant."
      },
      {
       "kicker": "Montrer",
@@ -2808,13 +2810,13 @@ const KITS_RAW = [
       "kicker": "Proposer",
       "title": "Le MagicPad4 Smart Keyboard",
       "text": "Il transforme la tablette en poste de travail compact.",
-      "tip": null
+      "tip": "Fixez le clavier devant le client et ouvrez un document : la tablette devient un poste de travail."
      },
      {
       "kicker": "Conclure",
       "title": "Le pack complet",
       "text": "Tablette, clavier, stylet et chargeur 66 W : vérifiez les offres groupées de votre enseigne.",
-      "tip": null
+      "tip": "Vérifiez l’offre groupée du jour dans votre enseigne avant d’annoncer un prix."
      }
     ]
    }
@@ -3223,7 +3225,7 @@ const KITS_RAW = [
       "kicker": "L'autonomie",
       "title": "80 Wh, jusqu'à 14 h",
       "text": "La journée de cours sans chercher une prise.",
-      "tip": null
+      "tip": "Demandez combien d’heures le client passe loin d’une prise dans une journée."
      },
      {
       "kicker": "La connectique",
@@ -3235,7 +3237,7 @@ const KITS_RAW = [
       "kicker": "L'écosystème",
       "title": "Avec un smartphone HONOR",
       "text": "Notifications, fichiers et presse-papiers partagés grâce à HONOR Connect.",
-      "tip": null
+      "tip": "Si le client a un smartphone HONOR, connectez-le au MagicBook et copiez un texte de l’un à l’autre."
      }
     ]
    }
@@ -3662,7 +3664,7 @@ const KITS_RAW = [
       "kicker": "Le sport",
       "title": "GPS double fréquence et 120+ modes",
       "text": "Course, vélo, randonnée : le tracé reste précis sans le téléphone.",
-      "tip": null
+      "tip": "Demandez quel sport pratique le client, puis ouvrez ce mode d’entraînement sur la montre."
      },
      {
       "kicker": "Les deux versions",
@@ -4042,25 +4044,25 @@ const KITS_RAW = [
       "kicker": "Le calme",
       "title": "50 dB de réduction de bruit",
       "text": "Trois niveaux pour s'adapter au lieu.",
-      "tip": null
+      "tip": "Faites essayer les écouteurs au client dans l’allée la plus bruyante du magasin."
      },
      {
       "kicker": "L'écoute du monde",
       "title": "Deux modes de transparence",
       "text": "Sons ambiants pour la rue, voix pour les annonces en gare.",
-      "tip": null
+      "tip": "Activez le mode voix et parlez au client sans qu’il retire les écouteurs."
      },
      {
       "kicker": "L'autonomie",
       "title": "46 heures avec le boîtier",
       "text": "Une recharge rapide de 10 minutes donne 3 heures d'écoute.",
-      "tip": null
+      "tip": "Demandez combien de temps durent ses trajets par jour, puis comptez les jours d’écoute ensemble."
      },
      {
       "kicker": "La compatibilité",
       "title": "Android et iPhone",
       "text": "L'appli HONOR AI Space règle le son et propose la traduction.",
-      "tip": null
+      "tip": "Demandez quel téléphone a le client et ouvrez l’appli HONOR AI Space sur le téléphone de démo."
      }
     ]
    }
@@ -4391,25 +4393,25 @@ const KITS_RAW = [
       "kicker": "Peur n° 2",
       "title": "« Je ne pourrai plus partager avec mes proches sur iPhone »",
       "text": "HONOR Connect échange photos et fichiers avec iPhone, iPad et Mac. Sur certains modèles, partage d'un simple toucher par NFC avec un iPhone 13 ou plus récent sous iOS 17.",
-      "tip": null
+      "tip": "Demandez si les proches du client sont sur iPhone. Si oui, montrez l’appli HONOR Connect."
      },
      {
       "kicker": "Peur n° 3",
       "title": "« Je ne connais pas l'interface »",
       "text": "MagicOS 10 est basé sur Android. L'appli Conseils, préinstallée, guide la prise en main.",
-      "tip": null
+      "tip": "Ouvrez l’appli Conseils sur le téléphone de démo et laissez le client la parcourir."
      },
      {
       "kicker": "Peur n° 4",
       "title": "« Et si ça tombe en panne ? »",
       "text": "Deux ans de garantie légale, numéro vert gratuit, chat 24 h sur 24 et service d'envoi en réparation.",
-      "tip": null
+      "tip": "Notez le numéro vert du SAV sur le ticket ou la facture du client."
      },
      {
       "kicker": "La conclusion",
       "title": "Proposez le transfert sur place",
       "text": "Le client repart avec ses données sur son nouveau téléphone : c'est le meilleur souvenir d'achat.",
-      "tip": null
+      "tip": "Proposez le transfert avant l’encaissement, pendant que le client est encore au comptoir."
      }
     ]
    }
