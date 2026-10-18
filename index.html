@@ -287,6 +287,7 @@ main{padding-top:calc(var(--hdr) + var(--sat));padding-bottom:calc(var(--nav) + 
 <div class="curtain" id="curtain"></div>
 <div id="layer"></div>
 
+<script src="contenu.js"></script>
 <script>
 'use strict';
 /* =====================================================================
@@ -295,21 +296,20 @@ main{padding-top:calc(var(--hdr) + var(--sat));padding-bottom:calc(var(--nav) + 
    endpoint  : URL qui reçoit les événements (POST JSON). null = suivi local
                uniquement, sur l'appareil.
    ===================================================================== */
-const CONFIG = { adminCode: '2026', endpoint: null, version: 'Coquille 0.1' };
+const CONFIG = { adminCode: '2026', endpoint: null, version: 'Version 1.0 · contenus au 11/10/2026' };
 
 /* =====================================================================
    CONTENU
-   Cette version est une coquille. Les textes, prix, dates, statuts,
-   sources, contradictions et visuels sont à reprendre de
-   trousse-honor.html et HONOR_one-pagers_interactif.html.
-   Tout champ laissé à null s'affiche « À reprendre ».
+   Le contenu des kits est dans contenu.js. Tout champ absent ou à null
+   s'affiche « À reprendre ».
 
    Format d'un kit (tous les champs sont facultatifs sauf id, name, univers) :
    {
      id, name, univers, family, type: 'phone'|'fold'|'tablet'|'laptop'|'watch'|'buds'|'service',
      variant, img: 'visuels/visuel-01.webp', imgAr: .57,   // visuel officiel détouré et son ratio largeur/hauteur
      status: 'verified'|'confirm'|'announced',
-     price: '1 999 €', priceDate: '12/10/2026', releaseFR: '…',
+     price: '1 999 €', priceStatus: 'confirm', priceNote: 'Relevé sur honor.com/fr le …', releaseFR: '…',
+     colors: '…', os: '…', footer: 'mentions légales de la fiche',
      hook: '…',
      figures: [{ value: 5000, unit: 'mAh', label: '…' }],       // 4
      points: ['…'],                                              // 5
@@ -329,45 +329,7 @@ const CONFIG = { adminCode: '2026', endpoint: null, version: 'Coquille 0.1' };
 const ENSEIGNES = ['Fnac','Darty','Boulanger','Orange','SFR','Bouygues Telecom','Free'];
 const ROLES = ['Promoteur','Chef de secteur','Formateur','Autre'];
 
-const UNIVERS = [
-  { id:'smartphones', name:'Smartphones', short:'Mobiles', families:'Magic, Magic V (pliables), série N (600, 400), série X', phare:'magic-v6' },
-  { id:'tablettes', name:'Tablettes', short:'Tablettes', families:'MagicPad, Pad', phare:'magicpad4' },
-  { id:'ordinateurs', name:'Ordinateurs', short:'PC', families:'MagicBook', phare:'magicbook-16-2026' },
-  { id:'montres', name:'Montres et bracelets', short:'Montres', families:'Montres, bracelets', phare:'watch-6' },
-  { id:'audio', name:'Audio', short:'Audio', families:'Earbuds, HONOR CHOICE', phare:'earbuds-4' },
-  { id:'services', name:'Services', short:'Services', families:'MagicOS, IA HONOR, Device Clone, HONOR Connect, garantie et SAV', phare:'passer-chez-honor' }
-];
-
-const KITS_RAW = [
-  { id:'magic-v6', name:'HONOR Magic V6', univers:'smartphones', family:'Magic V · pliable', type:'fold', img:'visuels/visuel-14.webp', imgAr:.773 },
-  { id:'magic8-pro', name:'HONOR Magic8 Pro', univers:'smartphones', family:'Magic', type:'phone', variant:'pro' },
-  { id:'magic8-lite', name:'HONOR Magic8 Lite', univers:'smartphones', family:'Magic', type:'phone', variant:'lite' },
-  { id:'600-pro', name:'HONOR 600 Pro', univers:'smartphones', family:'Série N · 600', type:'phone', variant:'n' },
-  { id:'600', name:'HONOR 600', univers:'smartphones', family:'Série N · 600', type:'phone', variant:'n' },
-  { id:'600-lite', name:'HONOR 600 Lite', univers:'smartphones', family:'Série N · 600', type:'phone', variant:'lite' },
-  { id:'magicpad4', name:'HONOR MagicPad4', univers:'tablettes', family:'MagicPad', type:'tablet', img:'visuels/visuel-10.webp', imgAr:1.37 },
-  { id:'magicbook-16-2026', name:'HONOR MagicBook 16 2026', univers:'ordinateurs', family:'MagicBook', type:'laptop', img:'visuels/visuel-08.webp', imgAr:1.443 },
-  { id:'watch-6', name:'HONOR Watch 6', univers:'montres', family:'Montres', type:'watch', img:'visuels/visuel-09.webp', imgAr:.947 },
-  { id:'earbuds-4', name:'HONOR Earbuds 4', univers:'audio', family:'Earbuds', type:'buds', img:'visuels/visuel-11.webp', imgAr:.984 },
-  { id:'passer-chez-honor', name:'Passer chez HONOR', univers:'services', family:'Services', type:'service' }
-];
-
-/* Gamme : produits sans kit complet. À compléter depuis trousse-honor.html. */
-const GAMME = [
-  { name:'Série 400', univers:'smartphones', type:'phone', status:'confirm' },
-  { name:'Série X', univers:'smartphones', type:'phone', status:'confirm' },
-  { name:'Gamme Pad', univers:'tablettes', type:'tablet', status:'confirm' },
-  { name:'Bracelets', univers:'montres', type:'watch', status:'confirm' },
-  { name:'HONOR CHOICE', univers:'audio', type:'buds', status:'confirm' },
-  { name:'MagicOS', univers:'services', type:'service', status:'confirm' },
-  { name:'IA HONOR', univers:'services', type:'service', status:'confirm' },
-  { name:'Device Clone', univers:'services', type:'service', status:'confirm' },
-  { name:'HONOR Connect', univers:'services', type:'service', status:'confirm' },
-  { name:'Garantie et SAV', univers:'services', type:'service', status:'confirm' }
-];
-/* Alerte affichée en tête d'univers (null = aucune). */
-const UNIVERS_ALERTS = {};
-
+/* UNIVERS, KITS_RAW, GAMME et UNIVERS_ALERTS sont définis dans contenu.js */
 const SPEC_LABELS = {
   phone:['Écran','Processeur','Photo','Batterie','Recharge','Protection IP','Poids et épaisseur','Système'],
   fold:['Écran intérieur','Écran extérieur','Épaisseur pliée','Poids','Processeur','Photo','Batterie','Recharge','Protection IP','Système'],
@@ -382,7 +344,8 @@ function seq(n, f){ return Array.from({length:n}, (_, i) => f(i + 1)); }
 function buildKit(k){
   const id = k.id;
   const base = {
-    status:'confirm', price:null, priceDate:null, releaseFR:null, hook:null, img:null,
+    status:'confirm', price:null, priceStatus:'confirm', priceNote:null, releaseFR:null, hook:null, img:null, colors:null, os:null, footer:null,
+    partial: !(k.modules && k.demo && k.objections && k.faq),
     figures: seq(4, () => ({ value:null, unit:'', label:null })),
     points: seq(5, () => null),
     alerts: seq(2, () => null),
@@ -422,6 +385,10 @@ const RM = window.matchMedia('(prefers-reduced-motion: reduce)');
 const reduced = () => RM.matches;
 const has = v => v !== null && v !== undefined && v !== '';
 function T(v, label){ return has(v) ? esc(v) : `<span class="ph">À reprendre · ${esc(label)}</span>`; }
+function srcLine(src){
+  if (!has(src)) return '';
+  return /^https?:/.test(src) ? `<a class="muted xs" href="${esc(src)}" target="_blank" rel="noopener">Source</a>` : `<span class="muted xs">Source : ${esc(src)}</span>`;
+}
 function stChip(s){ const d = STATUS[s] || STATUS.confirm; return `<span class="st ${d.cls}"><i></i>${d.label}</span>`; }
 
 function mkStore(area){
@@ -835,7 +802,8 @@ function renderUnivers(v, id){
         <div class="lbl">Kit phare</div>
         <div class="stage" style="height:250px;margin:14px 0 46px">${visual(phare, 250, { mw:'90%' })}</div>
         <div style="font-size:24px;line-height:1.15">${esc(phare.name)}</div>
-        <div class="k-meta">${stChip(phare.status)}<span class="muted small">${has(phare.price) ? esc(phare.price) : 'Prix à reprendre'}</span></div>
+        <div class="k-meta">${stChip(phare.status)}</div>
+        <div class="k-meta"><span class="muted small">${has(phare.price) ? esc(phare.price) : 'Prix à reprendre'}</span>${has(phare.price) ? stChip(phare.priceStatus) : ''}</div>
         <p class="muted small" style="margin-top:10px">${T(phare.hook, 'accroche')}</p>
         <span class="btn" style="margin-top:18px">Ouvrir le kit</span>
       </a>
@@ -847,10 +815,10 @@ function renderUnivers(v, id){
         <div style="margin-top:8px">${stChip(k.status)}</div></a>`).join('')}</div></section>` : ''}
     <section class="sec gut"><div class="sec-h"><h2>Gamme</h2><span class="muted small">${gam.length}</span></div>
       <div class="list">${gam.map(g => `<div class="card row" style="padding:12px 14px 12px 8px">
-        <div style="width:54px;height:54px;display:flex;align-items:center;justify-content:center;flex:none;opacity:.75">${visual(g, 44, { spin:false })}</div>
-        <div class="grow"><div>${esc(g.name)}</div><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">${stChip(g.status)}<span class="tag">Kit à construire</span></div></div>
+        <div style="width:58px;height:64px;display:flex;align-items:center;justify-content:center;flex:none${g.img ? '' : ';opacity:.75'}">${visual(g, 56, { spin:false })}</div>
+        <div class="grow"><div>${esc(g.name)}</div>${g.note ? `<div class="muted xs" style="margin-top:4px">${esc(g.note)}</div>` : ''}<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">${stChip(g.status)}<span class="tag">Kit à construire</span></div></div>
       </div>`).join('')}
-      <div class="card pad muted small">Autres références de l’univers : à reprendre de la trousse actuelle.</div></div>
+      </div>
     </section>
   </div>`;
 }
@@ -873,10 +841,11 @@ function renderKit(v, id, tab){
       <div class="eyebrow">${esc(UNI[k.univers].name)} · ${esc(k.family || '')}</div>
       <div class="stage">${visual(k, h, { plx:true, mw:'90%' })}</div>
       <h1 class="k-name">${esc(k.name)}</h1>
-      <div class="k-meta"><span>${has(k.price) ? esc(k.price) : '<span class="ph">Prix à reprendre</span>'}</span>${stChip(k.status)}</div>
-      <div class="k-date">${has(k.priceDate) ? `Relevé sur honor.com/fr le ${esc(k.priceDate)}` : 'Relevé sur honor.com/fr le : à reprendre'}<br>${has(k.releaseFR) ? `Sortie France : ${esc(k.releaseFR)}` : 'Sortie France : à reprendre'}</div>
+      <div class="k-meta">${stChip(k.status)}</div>
+      <div class="k-meta"><span>${has(k.price) ? esc(k.price) : '<span class="ph">Prix à reprendre</span>'}</span>${has(k.price) ? stChip(k.priceStatus) : ''}</div>
+      <div class="k-date">${has(k.priceNote) ? esc(k.priceNote) : 'Relevé sur honor.com/fr le : à reprendre'}<br>${has(k.releaseFR) ? `Sortie France : ${esc(k.releaseFR)}` : 'Sortie France : à reprendre'}</div>
     </div>
-    <div class="ph-band">${I.info}<span>Coquille : le contenu de ce kit est à reprendre de la trousse actuelle et des fiches vendeur vérifiées.</span></div>
+    ${k.partial ? `<div class="ph-band">${I.info}<span>Kit partiel : les contenus marqués « À reprendre » n’existent pas encore dans les fiches vérifiées.</span></div>` : ''}
     <div class="tabs"><div class="pill" id="tabs" role="tablist">${TABS.map(t => `<button class="pill-i${t[0] === tab ? ' on' : ''}" role="tab" data-tab="${t[0]}" aria-selected="${t[0] === tab}">${t[1]}</button>`).join('')}</div></div>
     <div class="panel" id="panel"></div>
   </div>`;
@@ -952,15 +921,17 @@ const TABRENDER = {
     return `<p class="muted">Questions reformulées à partir des sources officielles.</p>
     <div style="margin-top:18px">${k.faq.map((f, i) => `<div class="acc" data-faq="${f.id}">
       <button class="acc-h" data-act="acc"><span class="q">${T(f.q, 'question ' + (i + 1))}</span>${I.plus}</button>
-      <div class="acc-b"><p>${T(f.a, 'réponse reformulée')}</p>${f.src ? `<a class="muted xs" href="${esc(f.src)}" target="_blank" rel="noopener" style="display:inline-block;margin-top:10px">Source</a>` : ''}</div></div>`).join('')}</div>`;
+      <div class="acc-b"><p>${T(f.a, 'réponse reformulée')}</p><div style="margin-top:10px">${srcLine(f.src)}</div></div></div>`).join('')}</div>`;
   },
   fiche(k){
-    return `<div>${k.specs.map(s => `<div class="spec"><div class="muted small">${esc(s.label)}</div><div class="v"><span>${T(s.value, 'valeur')}</span>${stChip(s.status)}${s.label === 'Protection IP' ? '<span class="muted xs">Indiquer la certification IP. Cette protection n’est pas permanente.</span>' : ''}${s.src ? `<a class="muted xs" href="${esc(s.src)}" target="_blank" rel="noopener">Source</a>` : ''}</div></div>`).join('')}</div>
+    return `<div>${k.specs.map(s => `<div class="spec"><div class="muted small">${esc(s.label)}</div><div class="v"><span>${T(s.value, 'valeur')}</span>${stChip(s.status)}${s.label === 'Protection IP' ? '<span class="muted xs">Indiquer la certification IP. Cette protection n’est pas permanente.</span>' : ''}${srcLine(s.src)}</div></div>`).join('')}
+      ${has(k.colors) ? `<div class="spec"><div class="muted small">Coloris</div><div class="v"><span>${esc(k.colors)}</span>${stChip(k.status === 'verified' ? 'verified' : 'confirm')}</div></div>` : ''}</div>
+    ${has(k.footer) ? `<p class="muted xs" style="margin-top:14px">${esc(k.footer)}</p>` : ''}
     <section class="sec"><div class="sec-h"><h2>Contradictions relevées</h2></div>
       <div class="list">${k.contradictions.map(c => `<div class="card pad"><div>${T(c.topic, 'sujet')}</div>
         <div class="step3" style="margin-top:10px"><div class="muted small">Source A : ${T(c.a, 'valeur annoncée')}</div><div class="muted small">Source B : ${T(c.b, 'valeur annoncée')}</div></div></div>`).join('')}</div></section>
     <section class="sec"><div class="sec-h"><h2>Sources</h2></div>
-      <div class="list">${k.sources.map(s => `<a class="card src tap" href="${esc(s.url)}" target="_blank" rel="noopener"><div class="grow"><div>${esc(s.label)}</div>${s.note ? `<div class="muted xs">${esc(s.note)}</div>` : ''}</div>${I.ext}</a>`).join('')}</div></section>`;
+      <div class="list">${k.sources.map(s => s.url ? `<a class="card src tap" href="${esc(s.url)}" target="_blank" rel="noopener"><div class="grow"><div>${esc(s.label)}</div>${s.note ? `<div class="muted xs">${esc(s.note)}</div>` : ''}</div>${I.ext}</a>` : `<div class="card src"><div class="grow"><div>${esc(s.label)}</div>${s.note ? `<div class="muted xs">${esc(s.note)}</div>` : ''}</div></div>`).join('')}</div></section>`;
   },
   videos(k){
     return `<p class="muted">Liens vers les chaînes YouTube officielles HONOR. Les vidéos s’ouvrent dans YouTube.</p>
@@ -1136,7 +1107,7 @@ function buildIndex(){
     k.objections.forEach((o, i) => add('Objections', has(o.q) ? o.q : `Objection ${i + 1} (à reprendre)`, `${k.name}${has(o.usage) ? ' · ' + o.usage : ''}`, `#/k/${k.id}/objections`));
     k.specs.forEach(s => add('Fiches', `${s.label} · ${k.name}`, has(s.value) ? s.value : 'Valeur à reprendre', `#/k/${k.id}/fiche`));
   });
-  GAMME.forEach(g => add('Gamme', g.name, `${UNI[g.univers].name} · Kit à construire`, `#/u/${g.univers}`));
+  GAMME.forEach(g => add('Gamme', g.name, `${UNI[g.univers].name} · ${g.note || 'Kit à construire'}`, `#/u/${g.univers}`));
   UNIVERS.forEach(u => add('Univers', u.name, u.families, `#/u/${u.id}`));
   return idx;
 }
